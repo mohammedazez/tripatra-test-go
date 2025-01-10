@@ -4,33 +4,6 @@ type User {
   email: String!
 }
 
-type Product {
-  id: ID!
-  name: String!
-  price: Float!
-  stock: Int!
-}
-
-type Query {
-  users: [User]!
-  products: [Product]!
-}
-
 type Mutation {
   addUser(name: String!, email: String!): User!
-  updateUser(id: ID!, name: String, email: String): User!
-  deleteUser(id: ID!): Boolean!
-
-  addProduct(name: String!, price: Float!, stock: Int!): Product!
-  updateProduct(id: ID!, name: String, price: Float, stock: Int)
-  deleteProduct(id: ID!): Boolean!
-}
-
-type AuthPayload {
-    token: String!
-    user: User!
-}
-
-type Mutation {
-    login(email: String!, password: String!): AuthPayload!
 }

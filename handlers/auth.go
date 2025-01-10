@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"tripatra-test-go/utils"
@@ -20,8 +19,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
-	fmt.Println("email", email)
-	fmt.Println("os email", os.Getenv("email"))
 	if email == os.Getenv("email") && password == os.Getenv("password") {
 		token, _ := utils.GenerateJWT(email)
 		w.Header().Set("Content-Type", "application/json")
