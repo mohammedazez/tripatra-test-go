@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"tripatra-test-go/db"
 	"tripatra-test-go/graph"
@@ -26,7 +27,11 @@ func main() {
 	r.Handle("/query", handlers.ValidateToken(srv))
 	r.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default to 8080 for local development
+	}
 	// Start server
-	log.Println("Server started on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Printf("Server started on :%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
