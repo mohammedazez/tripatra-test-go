@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"time"
 	"tripatra-test-go/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,12 +20,41 @@ var productCollection *mongo.Collection
 
 func Connect() {
 	var err error
-	client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("mongo_uri")))
-	if err != nil {
-		log.Fatal(err)
+
+	// MongoDB Atlas URI from environment variable
+	mongoURI := os.Getenv("mongo_uri")
+	if mongoURI == "" {
+		log.Fatal("mongo_uri is not set in environment variables")
 	}
-	userCollection = client.Database(os.Getenv("db_name")).Collection("users")
-	productCollection = client.Database(os.Getenv("db_name")).Collection("products")
+
+	// Set Stable API options
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().
+		ApplyURI(mongoURI).
+		SetServerAPIOptions(serverAPI).
+		SetConnectTimeout(10 * time.Second)
+
+	// Connect to MongoDB
+	client, err = mongo.Connect(context.TODO(), clientOptions)
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+
+	// Confirm connection with a ping
+	err = client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err()
+	if err != nil {
+		log.Fatalf("Ping failed: %v", err)
+	}
+
+	fmt.Println("Connected to MongoDB Atlas successfully!")
+
+	// Initialize collections
+	dbName := os.Getenv("db_name")
+	if dbName == "" {
+		log.Fatal("db_name is not set in environment variables")
+	}
+	userCollection = client.Database(dbName).Collection("users")
+	productCollection = client.Database(dbName).Collection("products")
 }
 
 func CreateUser(user *models.User) (*models.User, error) {
