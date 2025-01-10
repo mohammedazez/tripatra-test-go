@@ -1,24 +1,46 @@
 package utils
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-func GenerateJWT(userEmail string) (string, error) {
-	secret := os.Getenv("jwt_key")
-	if secret == "" {
-		return "", errors.New("JWT secret not set")
-	}
+var jwtKey = []byte(os.Getenv("jwt_key"))
 
-	claims := &jwt.StandardClaims{
-		Subject:   userEmail,
-		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-	}
+type Claims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
 
+func GenerateToken(email string) (string, error) {
+	// Set expiration time (24 hours from now)
+	expirationTime := time.Now().Add(24 * time.Hour)
+	claims := &Claims{
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secret))
+	return token.SignedString(jwtKey)
+}
+
+func ValidateToken(tokenStr string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return nil, fmt.Errorf("couldn't parse claims")
+	}
+
+	return claims, nil
 }

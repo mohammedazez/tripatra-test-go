@@ -20,9 +20,10 @@ func main() {
 	r := mux.NewRouter()
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
-	r.HandleFunc("/login", handlers.LoginHandler).Methods("POST")
+	r.Use(handlers.CORS)
 
-	r.Handle("/query", srv)
+	r.HandleFunc("/login", handlers.Login).Methods("POST")
+	r.Handle("/query", handlers.ValidateToken(srv))
 	r.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 
 	// Start server
