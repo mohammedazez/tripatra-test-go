@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 	"tripatra-test-go/models"
 
@@ -22,7 +21,7 @@ func Connect() {
 	var err error
 
 	// MongoDB Atlas URI from environment variable
-	mongoURI := os.Getenv("mongo_uri")
+	mongoURI := "mongodb+srv://cangkoel02:eLIlsUOmF8L2Pk0Y@cluster0.sbnn1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 	if mongoURI == "" {
 		log.Fatal("mongo_uri is not set in environment variables")
 	}
@@ -49,7 +48,7 @@ func Connect() {
 	fmt.Println("Connected to MongoDB Atlas successfully!")
 
 	// Initialize collections
-	dbName := os.Getenv("db_name")
+	dbName := "tripatra"
 	if dbName == "" {
 		log.Fatal("db_name is not set in environment variables")
 	}

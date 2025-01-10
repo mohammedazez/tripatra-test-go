@@ -4,18 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"tripatra-test-go/models"
 	"tripatra-test-go/utils"
-
-	"github.com/joho/godotenv"
 )
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
-	}
-}
+// func init() {
+// 	if err := godotenv.Load(); err != nil {
+// 		panic("Error loading .env file")
+// 	}
+// }
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user models.User
@@ -25,13 +22,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if os.Getenv("password") != user.Password {
+	if "12345" != user.Password {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
 	// Generate token
-	token, err := utils.GenerateToken(os.Getenv("email"))
+	token, err := utils.GenerateToken("aziz@mail.com")
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
