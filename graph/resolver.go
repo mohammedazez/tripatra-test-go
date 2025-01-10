@@ -55,6 +55,51 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, err
 	return err == nil, err
 }
 
+// AddProduct is the resolver for the addProduct field.
+func (r *mutationResolver) AddProduct(ctx context.Context, name string, price float64, stock int) (*model.Product, error) {
+	product := &models.Product{
+		Name:  name,
+		Price: price,
+		Stock: stock,
+	}
+
+	// Create the product in the database (models.Product)
+	createdProduct, err := db.CreateProduct(product)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to model.Product (GraphQL model)
+	return &model.Product{
+		ID:    createdProduct.ID.Hex(),
+		Name:  createdProduct.Name,
+		Price: createdProduct.Price,
+		Stock: createdProduct.Stock,
+	}, nil
+}
+
+// UpdateProduct is the resolver for the updateProduct field.
+func (r *mutationResolver) UpdateProduct(ctx context.Context, id string, name *string, price *float64, stock *int) (*model.Product, error) {
+	updatedProduct, err := db.UpdateProduct(id, name, price, stock)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to model.Product (GraphQL model)
+	return &model.Product{
+		ID:    updatedProduct.ID.Hex(),
+		Name:  updatedProduct.Name,
+		Price: updatedProduct.Price,
+		Stock: updatedProduct.Stock,
+	}, nil
+}
+
+// DeleteProduct is the resolver for the deleteProduct field.
+func (r *mutationResolver) DeleteProduct(ctx context.Context, id string) (bool, error) {
+	err := db.DeleteProduct(id)
+	return err == nil, err
+}
+
 // GetUser is the resolver for the getUser field.
 func (r *queryResolver) GetUser(ctx context.Context, id string) (*model.User, error) {
 	user, err := db.GetUser(id)
@@ -68,6 +113,61 @@ func (r *queryResolver) GetUser(ctx context.Context, id string) (*model.User, er
 		Name:  user.Name,
 		Email: user.Email,
 	}, nil
+}
+
+// GetUsers is the resolver for the getUsers field.
+func (r *queryResolver) GetUsers(ctx context.Context) ([]*model.User, error) {
+	users, err := db.GetUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to []*model.User (GraphQL model)
+	var result []*model.User
+	for _, user := range users {
+		result = append(result, &model.User{
+			ID:    user.ID.Hex(),
+			Name:  user.Name,
+			Email: user.Email,
+		})
+	}
+	return result, nil
+}
+
+// GetProduct is the resolver for the getProduct field.
+func (r *queryResolver) GetProduct(ctx context.Context, id string) (*model.Product, error) {
+	product, err := db.GetProduct(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to model.Product (GraphQL model)
+	return &model.Product{
+		ID:    product.ID.Hex(),
+		Name:  product.Name,
+		Price: product.Price,
+		Stock: product.Stock,
+	}, nil
+}
+
+// GetProducts is the resolver for the getProducts field.
+func (r *queryResolver) GetProducts(ctx context.Context) ([]*model.Product, error) {
+	products, err := db.GetProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to []*model.Product (GraphQL model)
+	var result []*model.Product
+	for _, product := range products {
+		result = append(result, &model.Product{
+			ID:    product.ID.Hex(),
+			Name:  product.Name,
+			Price: product.Price,
+			Stock: product.Stock,
+		})
+	}
+	return result, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
