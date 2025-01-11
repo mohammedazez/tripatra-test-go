@@ -23,7 +23,7 @@ func main() {
 
 	r.Use(handlers.CORSv2)
 
-	r.HandleFunc("/login", handlers.Login).Methods("POST")
+	r.HandleFunc("/login", handlers.Login).Methods("POST", "OPTIONS")
 	r.Handle("/query", handlers.ValidateToken(srv))
 	r.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 
