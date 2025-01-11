@@ -21,7 +21,7 @@ func main() {
 	r := mux.NewRouter()
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
-	r.Use(handlers.CORS)
+	r.Use(handlers.CORSv2)
 
 	r.HandleFunc("/login", handlers.Login).Methods("POST")
 	r.Handle("/query", handlers.ValidateToken(srv))
